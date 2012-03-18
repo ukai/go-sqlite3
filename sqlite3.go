@@ -15,11 +15,6 @@ _sqlite3_bind_blob(sqlite3_stmt *stmt, int n, void *p, int np) {
   return sqlite3_bind_blob(stmt, n, p, np, SQLITE_TRANSIENT);
 }
 
-static int
-_sqlite3_prepare_v2(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, char **pzTail) {
-  return sqlite3_prepare_v2(db, zSql, nByte, ppStmt, (const char**)pzTail);
-}
-
 #cgo pkg-config: sqlite3
 */
 import "C"
@@ -131,7 +126,7 @@ func (c *SQLiteConn) Prepare(query string) (driver.Stmt, error) {
 	defer C.free(unsafe.Pointer(pquery))
 	var s *C.sqlite3_stmt
 	var perror *C.char
-	rv := C._sqlite3_prepare_v2(c.db, pquery, -1, &s, &perror)
+	rv := C.sqlite3_prepare_v2(c.db, pquery, -1, &s, &perror)
 	if rv != C.SQLITE_OK {
 		return nil, errors.New(C.GoString(C.sqlite3_errmsg(c.db)))
 	}
